@@ -1,2 +1,2 @@
 # BIS15W2021_project
-#by Jayashri Viswanathan and Zabrisky Roland (group 13)
+by Jayashri Viswanathan and Zabrisky Roland (group 13)
