@@ -1,0 +1,67 @@
+---
+title: "BIS Project Data Exploration"
+author: "Zabrisky"
+date: "2/16/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+library(tidyverse)
+library(janitor)
+```
+
+
+```{r}
+covid_counties <- readr::read_csv("counties.csv")
+```
+```{r}
+covid_deaths <- readr::read_csv("deaths_timeseries.csv")
+covid_deaths
+```
+
+
+```{r}
+glimpse(covid_deaths)
+```
+```{r}
+head(covid_deaths)
+```
+```{r}
+##covid_deaths2<- covid_deaths %>% 
+  ##separate(Combined_Key, into = c("county","state", "country", sep= " - "))
+##covid_deaths2
+```
+
+
+
+```{r}
+covid_deaths2<- covid_deaths %>% 
+  group_by(Combined_Key) %>%
+  mutate(death_total= sum(across(contains("20")))) %>% 
+  select(Combined_Key, death_total) %>% 
+  filter(death_total>100) %>% 
+  arrange(desc(death_total)) 
+covid_deaths2
+  
+
+```
+```{r}
+covid_deaths2 %>% 
+  ggplot(aes(x=reorder(Combined_Key,death_total), y=death_total, fill=Combined_Key))+geom_col()+ theme(axis.text.x = element_text(angle = 60, hjust = 1))
+```
+
+
+
+```{r}
+glimpse(covid_counties)
+```
+```{r}
+names(covid_counties)
+```
+
+
+
+
