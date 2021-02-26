@@ -1,0 +1,35 @@
+---
+title: "data exploration"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(here)
+library(janitor)
+library(dplyr)
+```
+
+Cleaning up the Data. 
+
+```{r}
+food_data <-read.csv("food and covid data/Fat_Supply_Quantity_Data.csv") %>%
+  clean_names()
+
+food_data
+```
+```{r}
+food_data %>%
+  ggplot(aes(x = log(confirmed), y = animal_fats)) +
+  geom_point()
+```
+
+
+```
+
