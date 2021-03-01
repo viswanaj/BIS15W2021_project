@@ -38,9 +38,101 @@ food_data %>%
 ```
 ```{r}
 food_data %>% 
-  group_by(Country) %>%
-  ggplot(aes(Meat,Deaths))+geom_point()+geom_smooth(method = lm)
+  select(Alcoholic.Beverages, Country) %>% 
+  arrange(desc(Alcoholic.Beverages))
 ```
+
+```{r}
+food_data %>% 
+  group_by(Country) %>%
+  ggplot(aes(Obesity,Deaths))+geom_point()+geom_smooth()
+```
+```{r}
+food_data %>% 
+  select(Obesity,Country) %>% 
+  arrange(desc(Obesity)) %>% 
+  mutate(island=)
+```
+```{r}
+island_food_data<- food_data %>% 
+  filter(Country== "Samoa"| Country=="United Kingdom"| Country=="Fiji" | Country=="Japan"| Country=="Australia"| Country=="New Zealand"| Country=="Kiribati"| Country=="Iceland"| Country=="Philippines") %>% 
+   mutate(island= TRUE)
+island_food_data
+```
+
+
+```{r}
+non_island_food_data<- food_data %>% 
+   filter( Country!="Australia", Country!="Samoa", Country!="United Kingdom", Country!="New Zealand", Country!="Kiribati", Country!="Iceland", Country!="Philippines", Country!="Fiji", Country!="Japan" ) %>%
+  mutate(island= FALSE)
+non_island_food_data
+```
+```{r}
+food_data %>% 
+  filter(Obesity>37) %>% 
+  select(Country, Confirmed, Deaths, Recovered)
+```
+
+```{r}
+island_food_complete <- rbind(non_island_food_data, island_food_data)
+island_food_complete
+```
+```{r}
+island_food_complete %>% 
+  select(Country, Undernourished) %>% 
+  arrange(desc(Undernourished))
+```
+```{r}
+island_food_complete %>% 
+  filter(Country!= "United Kingdom") %>% 
+  ggplot(aes(Obesity,Deaths,color=island))+geom_point()+geom_smooth(method = lm)
+```
+```{r}
+island_food_complete %>% 
+  ggplot(aes(Obesity,Deaths,color=island))+geom_point()+geom_smooth(method = lm)
+```
+
+
+```{r}
+well_nourished_countries<-food_data %>% 
+  filter(Undernourished== "<2.5") %>% 
+  cbind(2.5) %>% 
+  mutate(Undernourished_numeric= mean(2.5)) %>% 
+  select(!"2.5")
+```
+
+```{r}
+food_experiment<- food_data %>% 
+  filter(Undernourished != "<2.5")
+
+```
+```{r}
+  food_experiment<-food_experiment %>% 
+  mutate(Undernourished_numeric=as.numeric(as.character(food_experiment$Undernourished)))
+  
+```
+```{r}
+nourishment_complete <- rbind(food_experiment, well_nourished_countries)
+nourishment_complete
+```
+```{r}
+is.numeric(nourishment_complete$Undernourished_numeric)
+```
+
+```{r}
+nourishment_complete <- nourishment_complete %>% 
+             mutate(nourishment_catagory= case_when(Undernourished_numeric <=2.5 ~ "low",
+                                              Undernourished_numeric > 2.5 & Undernourished_numeric <= 15 ~ "medium",
+                                              Undernourished_numeric > 15 ~ "high"))
+nourishment_complete
+```
+```{r}
+nourishment_complete %>% 
+  ggplot(aes(Obesity, Deaths, color= nourishment_catagory))+geom_point()+geom_smooth(method = lm)
+```
+
+
+
 
 
 
