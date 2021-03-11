@@ -357,9 +357,9 @@ high_and_low_obesity_recovery
 
 
 ```{r}
-names(high_and_low_obesity)
+names(high_and_low_obesity_recovery)
 ```
-
+#USE THIS FOR APP COMPARISONS BETWEEN HIGH AND LOW OBESITY RATE COUNTRIES ON RECOVERY TO DEATH RATIO 
 #this the comparison between high and low obesity with a recovery to death ratio 
 ```{r,eval=FALSE,echo=TRUE}
 library(shiny)
@@ -400,19 +400,39 @@ names(kg_gen_not)
 "Country","Alcoholic.Beverages","Animal.fats","Animal.Products","Aquatic.Products..Other","Cereals...Excluding.Beer","Eggs","Fish..Seafood",
 "Fruits...Excluding.Wine","Meat","Milk...Excluding.Butter","Miscellaneous","Offals","Oilcrops","Pulses","Spices","Starchy.Roots","Stimulants","Sugar...Sweeteners","Sugar.Crops" "Treenuts","Vegetable.Oils","Vegetables","Vegetal.Products","Obesity","Undernourished","Confirmed","Deaths","Recovered","Active","Population","Unit..all.except.Population."
 
-#app for general overview
+
+#use for app adding a ratio column, has not set to update variable in app yet
+```{r}
+kg_gen_not%>%
+  summarise(Country,Alcoholic.Beverages,Animal.fats,Animal.Products,Aquatic.Products..Other,Cereals...Excluding.Beer,Eggs,Fish..Seafood,Fruits...Excluding.Wine,Meat,Milk...Excluding.Butter,Miscellaneous,Offals,Oilcrops,Pulses,Spices,Starchy.Roots,Stimulants,Sugar...Sweeteners,Sugar.Crops,Treenuts,Vegetable.Oils,Vegetables,Vegetal.Products,Obesity,Undernourished,Confirmed,Deaths,Recovered,Active,Population,Unit..all.except.Population.,Recovery_to_Death_Ratio=Recovered/Deaths)%>%
+  filter(across(c(Country,Alcoholic.Beverages,Animal.fats,Animal.Products,Aquatic.Products..Other,Cereals...Excluding.Beer,Eggs,Fish..Seafood,Fruits...Excluding.Wine,Meat,Milk...Excluding.Butter,Miscellaneous,Offals,Oilcrops,Pulses,Spices,Starchy.Roots,Stimulants,Sugar...Sweeteners,Sugar.Crops,Treenuts,Vegetable.Oils,Vegetables,Vegetal.Products,Obesity,Undernourished,Confirmed,Deaths,Recovered,Active,Population,Unit..all.except.Population.,Recovery_to_Death_Ratio=Recovered/Deaths),~!is.na(.x)))
+```
+
+
+```{r}
+kg_gen_not<-kg_gen_not%>%
+  summarise(Country,Alcoholic.Beverages,Animal.fats,Animal.Products,Aquatic.Products..Other,Cereals...Excluding.Beer,Eggs,Fish..Seafood,Fruits...Excluding.Wine,Meat,Milk...Excluding.Butter,Miscellaneous,Offals,Oilcrops,Pulses,Spices,Starchy.Roots,Stimulants,Sugar...Sweeteners,Sugar.Crops,Treenuts,Vegetable.Oils,Vegetables,Vegetal.Products,Obesity,Undernourished,Confirmed,Deaths,Recovered,Active,Population,Unit..all.except.Population.,Recovery_to_Death_Ratio=Recovered/Deaths)
+  
+```
+
+
+
+
+#USE THIS FOR APP LARGE SCALE OVER VIEW
+#app for general overview 
+#remove under nourished 
 ```{r,eval=FALSE,echo=TRUE} 
 library(shiny)
 
 ui_1 <- dashboardPage(
-  dashboardHeader(title = "Test"),
+  dashboardHeader(title = "Diet Observations"),
   dashboardSidebar(),
   dashboardBody(
-    selectInput("x","Select X variable",choices=c("Population","Recovered","Obesity","Deaths"),
+    selectInput("x","Select X variable",choices=c("Country","Alcoholic.Beverages","Animal.fats","Animal.Products","Aquatic.Products..Other","Cereals...Excluding.Beer","Eggs","Fish..Seafood","Fruits...Excluding.Wine","Meat","Milk...Excluding.Butter","Miscellaneous","Offals","Oilcrops","Pulses","Spices","Starchy.Roots","Stimulants","Sugar...Sweeteners","Sugar.Crops","Treenuts","Vegetable.Oils","Vegetables","Vegetal.Products","Obesity","Undernourished","Confirmed","Deaths","Recovered","Active","Population","Unit..all.except.Population."),
+              selected = "Alcoholic.Beverages"),
+ selectInput("y","Select y variable",choices = c("Country","Alcoholic.Beverages","Animal.fats","Animal.Products","Aquatic.Products..Other","Cereals...Excluding.Beer","Eggs","Fish..Seafood","Fruits...Excluding.Wine","Meat","Milk...Excluding.Butter","Miscellaneous","Offals","Oilcrops","Pulses","Spices","Starchy.Roots","Stimulants","Sugar...Sweeteners","Sugar.Crops","Treenuts","Vegetable.Oils","Vegetables","Vegetal.Products","Obesity","Undernourished","Confirmed","Deaths","Recovered","Active","Population","Unit..all.except.Population."),
               selected = "Deaths"),
- selectInput("y","Select y variable",choices = c("Population","Recovered","Obesity","Deaths"),
-              selected = "Deaths"),
- box(title = "Test", width = 10,
+ box(title = "Diet Compared to COVID-19 Deaths", width = 15,
   plotOutput("plot",width = "1000px",height = "900px")
     
     
@@ -422,7 +442,7 @@ ui_1 <- dashboardPage(
 
 server_1 <- function(input, output) {
   output$plot<-renderPlot({
-  ggplot(high_and_low_obesity,aes_string(x=input$x,y=input$y)) + geom_point(size=4.5)+ theme_light(base_size = 18)+geom_smooth(method = lm)
+  ggplot(kg_gen_not,aes_string(x=input$x,y=input$y)) + geom_point(size=4.5)+ theme_light(base_size = 18)+geom_smooth(method = lm)+theme(plot.title = element_text(hjust = 2))
     })
     #session$onSessionEnded(stopApp)
     }
@@ -439,7 +459,7 @@ country_comparison<-kg_gen_not%>%
   summarise(Country,Confirmed,Recovered,Deaths,Obesity,Population,Recovery_to_death_ratio=Recovered/Deaths)
 ```
 
-
+#USE FOR APP THIS IS SMALL SCALE COMPARISON OF COUNTRIES
 ```{r,eval=FALSE,echo=TRUE} 
 library(shiny)
 
@@ -448,7 +468,7 @@ ui_1 <- dashboardPage(
   dashboardSidebar(),
   dashboardBody(
     selectInput("x","Select X variable",choices=c("Country","Population","Recovered","Obesity","Deaths","Recovery_to_death_ratio"),
-              selected = "Deaths"),
+              selected = "Country"),
  selectInput("y","Select y variable",choices = c("Country","Population","Recovered","Obesity","Deaths", "Recovery_to_death_ratio"),
               selected = "Deaths"),
  box(title = "Test", width = 10,
@@ -481,7 +501,37 @@ shinyApp(ui_1,server_1)
 
 
 
+#fix the recovery to death ratio and remove country
+```{r,eval=FALSE,echo=TRUE} 
+library(shiny)
+
+ui_1 <- dashboardPage(
+  dashboardHeader(title = "Test"),
+  dashboardSidebar(),
+  dashboardBody(
+    selectInput("x","Select X variable",choices=c("Country","Population","Recovered","Obesity","Deaths","Recovery_to_death_ratio"),
+              selected = "Deaths"),
+ selectInput("y","Select y variable",choices = c("Country","Population","Recovered","Obesity","Deaths", "Recovery_to_death_ratio"),
+              selected = "Deaths"),
+ box(title = "Test", width = 10,
+  plotOutput("plot",width = "1000px",height = "900px")
+    
+    
+)
+) 
+)
+
+server_1 <- function(input, output) {
+  output$plot<-renderPlot({
+  ggplot(kg_gen_not,aes_string(x=input$x,y=input$y)) + geom_point()+ theme_light(base_size = 18)+ geom_smooth(method = lm) +theme(legend.position = "bottom",axis.text=element_text(angle = 60,hjust = 1))
+    })
+   #session$onSessionEnded(stopApp) 
+    }
 
 
+shinyApp(ui_1,server_1)
+
+```
 
 
+```{r,eval=FALSE,echo=TRUE} 
