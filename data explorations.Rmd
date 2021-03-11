@@ -5,6 +5,25 @@ output:
     keep_md: yes
 ---
 
+
+
+```{r}
+if (!require("tidyverse")) install.packages('tidyverse')
+```
+
+```{r message=FALSE, warning=FALSE}
+library("tidyverse")
+library("shiny")
+library("shinydashboard")
+library("janitor")
+library("naniar")
+```
+
+
+
+
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -255,3 +274,382 @@ nourishment_complete %>%
 
 
 
+
+
+
+
+
+
+```{r}
+kg_gen_not<-read.csv("food and covid data/Food_Supply_Quantity_kg_Data_general_notation.csv")
+```
+
+
+
+```{r}
+summary(kg_gen_not)
+```
+
+
+```{r}
+kg_gen_not%>%
+  select(Country,Obesity)
+```
+
+```{r}
+kg_gen_not%>%
+  select(Country,Obesity)%>%
+  arrange(desc(Obesity))%>%
+  head(10)%>%
+  ggplot(aes(x=Country,y=Obesity))+
+  geom_col()+
+   theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 60, hjust=1))
+```
+
+#look at island nations to see covid death and recovery rates
+
+
+
+
+
+```{r}
+kg_gen_not%>%
+  select(Country,Obesity,Deaths)%>%
+  arrange(desc(Obesity))%>%
+  tail(10)%>%
+  ggplot(aes(x=Country,y=Obesity))+
+  geom_col()+
+   theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 60, hjust=1))
+```
+
+```{r}
+kg_gen_not%>%
+  select(Country,Obesity,Deaths)%>%
+  filter(Obesity!="NA")%>%
+  arrange(desc(Obesity))%>%
+  tail(10)
+```
+
+```{r}
+kg_gen_not%>%
+  select(Country,Obesity,Deaths)%>%
+  filter(Obesity!="NA")%>%
+  arrange(desc(Obesity))%>%
+  tail(10)%>%
+  ggplot(aes(x=Obesity,y=Deaths,fill=Country))+
+  geom_col()
+```
+
+
+```{r}
+kg_gen_not%>%
+  select(Country,Obesity,Deaths)%>%
+  arrange(desc(Obesity))%>%
+  tail(10)%>%
+  ggplot(aes(x=Country,y=Obesity))+
+  geom_col()+
+   theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 60, hjust=1))
+```
+
+
+
+
+
+```{r}
+kg_gen_not%>%
+  select(Obesity,Country,Confirmed,Deaths,Recovered)%>%
+  filter(Recovered!=0)%>%
+  filter(Deaths!=0)%>%
+  summarise(Country,recovery_to_death_ratio=Recovered/Deaths)%>%
+  arrange(desc(recovery_to_death_ratio))%>%
+  head(10)
+  
+```
+
+
+
+```{r}
+kg_gen_not%>%
+  select(Obesity,Country,Confirmed,Deaths,Recovered)%>%
+  filter(Recovered!=0)%>%
+  filter(Deaths!=0)%>%
+  summarise(Country,recovery_to_death_ratio=Recovered/Deaths)%>%
+  arrange(desc(recovery_to_death_ratio))%>%
+  head(10)%>%
+  ggplot(aes(x=Country,y=recovery_to_death_ratio))+
+  geom_col()+
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 60, hjust=1))
+```
+
+#observe the diets and and obesity rates of high recovery nations
+
+```{r}
+high_recovery_nations<-kg_gen_not%>%
+  filter(Country=="Mongolia"|Country== "United Arab Emirates"|Country=="Maldives"|Country=="Malaysia"|Country=="Thailand"|Country=="Iceland"|Country=="Sri Lanka"|Country=="Cote d'Ivoire"|Country=="Guinea"|Country=="Kuwait")
+```
+
+
+```{r}
+high_recovery_nations%>%
+  select(Obesity,Country,Confirmed,Deaths,Recovered)%>%
+  filter(Recovered!=0)%>%
+  filter(Deaths!=0)%>%
+  summarise(Country,Obesity,recovery_to_death_ratio=Recovered/Deaths)%>%
+  ggplot(aes(x=Obesity,y=recovery_to_death_ratio,fill=Country))+
+  geom_col()
+```
+
+#so this is kinda weird, mongolia has high recovery and is moderate in obesity scale, maybe it has to do with the specifics of their diet
+#for now lets look at highest infection rate countries
+
+```{r}
+#high obesity
+kg_gen_not%>%
+  arrange(desc(Deaths))%>%
+  summarise(Country,Confirmed,Recovered,Deaths,Obesity,recovery_to_death_ratio=Recovered/Deaths)%>%
+  head(10)
+```
+
+```{r}
+high_obesity<-kg_gen_not%>%
+  arrange(desc(Obesity))%>%
+  summarise(Country,Confirmed,Recovered,Deaths,Obesity,Population,Recovery_to_death_ratio=Recovered/Deaths)%>%
+  head(10)
+```
+
+
+#need to fix USA's recovered column that looks like an error 
+
+```{r}
+#low obesity
+kg_gen_not%>%
+  select(Country,Confirmed,Recovered,Deaths,Obesity,Population)%>%
+  filter(Obesity!="NA")%>%
+  arrange(desc(Obesity))%>%
+  tail(10)
+```
+
+```{r}
+low_obesity_1<-kg_gen_not%>%
+  select(Country,Confirmed,Recovered,Deaths,Obesity,Population)%>%
+  filter(Confirmed!="NA"& Obesity!="NA" & Deaths!=0)%>%
+  arrange(desc(Obesity))%>%
+  tail(10)%>%
+  summarise(Country,Confirmed,Recovered,Deaths,Obesity,Population,Recovery_to_death_ratio=Recovered/Deaths)
+```
+
+
+```{r}
+low_obesity_1
+```
+
+
+
+```{r}
+high_obesity
+```
+
+
+
+```{r}
+kg_gen_not%>%
+  arrange(desc(Deaths))%>%
+  summarise(Country,Confirmed,Recovered,Deaths,Obesity)%>%
+  head(10)%>%
+    ggplot(aes(x=Obesity,y=Deaths,fill=Country))+
+  geom_col()
+```
+
+
+
+```{r}
+#comparing low vs high obesity relative to covid death rate by countries
+high_and_low_obesity_recovery<-rbind(low_obesity_1,high_obesity)
+
+high_and_low_obesity_recovery
+```
+
+
+```{r}
+names(high_and_low_obesity_recovery)
+```
+#USE THIS FOR APP COMPARISONS BETWEEN HIGH AND LOW OBESITY RATE COUNTRIES ON RECOVERY TO DEATH RATIO 
+#this the comparison between high and low obesity with a recovery to death ratio 
+```{r,eval=FALSE,echo=TRUE}
+library(shiny)
+
+ui_1 <- dashboardPage(
+  dashboardHeader(title = "Test"),
+  dashboardSidebar(),
+  dashboardBody(
+    selectInput("x","Select X variable",choices = c("Population","Recovered","Obesity","Deaths",'Recovery_to_death_ratio=Recovered/Deaths'),
+              selected = "Deaths"),
+ selectInput("y","Select y variable",choices = c("Population","Recovered","Obesity","Deaths",'Recovery_to_death_ratio=Recovered/Deaths'),
+              selected = "Deaths"),
+ box(title = "Test", width = 10,
+  plotOutput("plot",width = "1000px",height = "900px")
+    
+)
+) 
+)
+
+server_1 <- function(input, output) {
+  output$plot<-renderPlot({
+  ggplot(high_and_low_obesity_recovery,aes_string(x=input$x,y=input$y, color="Country")) + geom_point(size=10)+ theme_light(base_size = 18)#+theme(legend.position = "bottom",axis.text=element_text(angle = 60,hjust = 1))
+    })
+    #session$onSessionEnded(stopApp)
+    }
+
+shinyApp(ui_1,server_1)
+```
+
+
+#population vs number of cases pick out the ones with the highest 
+
+
+
+```{r}
+names(kg_gen_not)
+```
+"Country","Alcoholic.Beverages","Animal.fats","Animal.Products","Aquatic.Products..Other","Cereals...Excluding.Beer","Eggs","Fish..Seafood",
+"Fruits...Excluding.Wine","Meat","Milk...Excluding.Butter","Miscellaneous","Offals","Oilcrops","Pulses","Spices","Starchy.Roots","Stimulants","Sugar...Sweeteners","Sugar.Crops" "Treenuts","Vegetable.Oils","Vegetables","Vegetal.Products","Obesity","Undernourished","Confirmed","Deaths","Recovered","Active","Population","Unit..all.except.Population."
+
+
+#use for app adding a ratio column, has not set to update variable in app yet
+```{r}
+kg_gen_not%>%
+  summarise(Country,Alcoholic.Beverages,Animal.fats,Animal.Products,Aquatic.Products..Other,Cereals...Excluding.Beer,Eggs,Fish..Seafood,Fruits...Excluding.Wine,Meat,Milk...Excluding.Butter,Miscellaneous,Offals,Oilcrops,Pulses,Spices,Starchy.Roots,Stimulants,Sugar...Sweeteners,Sugar.Crops,Treenuts,Vegetable.Oils,Vegetables,Vegetal.Products,Obesity,Undernourished,Confirmed,Deaths,Recovered,Active,Population,Unit..all.except.Population.,Recovery_to_Death_Ratio=Recovered/Deaths)%>%
+  filter(across(c(Country,Alcoholic.Beverages,Animal.fats,Animal.Products,Aquatic.Products..Other,Cereals...Excluding.Beer,Eggs,Fish..Seafood,Fruits...Excluding.Wine,Meat,Milk...Excluding.Butter,Miscellaneous,Offals,Oilcrops,Pulses,Spices,Starchy.Roots,Stimulants,Sugar...Sweeteners,Sugar.Crops,Treenuts,Vegetable.Oils,Vegetables,Vegetal.Products,Obesity,Undernourished,Confirmed,Deaths,Recovered,Active,Population,Unit..all.except.Population.,Recovery_to_Death_Ratio=Recovered/Deaths),~!is.na(.x)))
+```
+
+
+```{r}
+kg_gen_not<-kg_gen_not%>%
+  summarise(Country,Alcoholic.Beverages,Animal.fats,Animal.Products,Aquatic.Products..Other,Cereals...Excluding.Beer,Eggs,Fish..Seafood,Fruits...Excluding.Wine,Meat,Milk...Excluding.Butter,Miscellaneous,Offals,Oilcrops,Pulses,Spices,Starchy.Roots,Stimulants,Sugar...Sweeteners,Sugar.Crops,Treenuts,Vegetable.Oils,Vegetables,Vegetal.Products,Obesity,Undernourished,Confirmed,Deaths,Recovered,Active,Population,Unit..all.except.Population.,Recovery_to_Death_Ratio=Recovered/Deaths)
+  
+```
+
+
+
+
+#USE THIS FOR APP LARGE SCALE OVER VIEW
+#app for general overview 
+#remove under nourished 
+```{r,eval=FALSE,echo=TRUE} 
+library(shiny)
+
+ui_1 <- dashboardPage(
+  dashboardHeader(title = "Diet Observations"),
+  dashboardSidebar(),
+  dashboardBody(
+    selectInput("x","Select X variable",choices=c("Country","Alcoholic.Beverages","Animal.fats","Animal.Products","Aquatic.Products..Other","Cereals...Excluding.Beer","Eggs","Fish..Seafood","Fruits...Excluding.Wine","Meat","Milk...Excluding.Butter","Miscellaneous","Offals","Oilcrops","Pulses","Spices","Starchy.Roots","Stimulants","Sugar...Sweeteners","Sugar.Crops","Treenuts","Vegetable.Oils","Vegetables","Vegetal.Products","Obesity","Undernourished","Confirmed","Deaths","Recovered","Active","Population","Unit..all.except.Population."),
+              selected = "Alcoholic.Beverages"),
+ selectInput("y","Select y variable",choices = c("Country","Alcoholic.Beverages","Animal.fats","Animal.Products","Aquatic.Products..Other","Cereals...Excluding.Beer","Eggs","Fish..Seafood","Fruits...Excluding.Wine","Meat","Milk...Excluding.Butter","Miscellaneous","Offals","Oilcrops","Pulses","Spices","Starchy.Roots","Stimulants","Sugar...Sweeteners","Sugar.Crops","Treenuts","Vegetable.Oils","Vegetables","Vegetal.Products","Obesity","Undernourished","Confirmed","Deaths","Recovered","Active","Population","Unit..all.except.Population."),
+              selected = "Deaths"),
+ box(title = "Diet Compared to COVID-19 Deaths", width = 15,
+  plotOutput("plot",width = "1000px",height = "900px")
+    
+    
+)
+) 
+)
+
+server_1 <- function(input, output) {
+  output$plot<-renderPlot({
+  ggplot(kg_gen_not,aes_string(x=input$x,y=input$y)) + geom_point(size=4.5)+ theme_light(base_size = 18)+geom_smooth(method = lm)+theme(plot.title = element_text(hjust = 2))
+    })
+    #session$onSessionEnded(stopApp)
+    }
+
+shinyApp(ui_1,server_1)
+```
+
+
+
+
+```{r}
+country_comparison<-kg_gen_not%>%
+  filter(Country=="Vietnam"|Country=="United States of America"|Country=="New Zealand"|Country=="United Kingdom"|Country=="Italy"|Country=="Korea, South")%>%
+  summarise(Country,Confirmed,Recovered,Deaths,Obesity,Population,Recovery_to_death_ratio=Recovered/Deaths)
+```
+
+#USE FOR APP THIS IS SMALL SCALE COMPARISON OF COUNTRIES
+```{r,eval=FALSE,echo=TRUE} 
+library(shiny)
+
+ui_1 <- dashboardPage(
+  dashboardHeader(title = "Test"),
+  dashboardSidebar(),
+  dashboardBody(
+    selectInput("x","Select X variable",choices=c("Country","Population","Recovered","Obesity","Deaths","Recovery_to_death_ratio"),
+              selected = "Country"),
+ selectInput("y","Select y variable",choices = c("Country","Population","Recovered","Obesity","Deaths", "Recovery_to_death_ratio"),
+              selected = "Deaths"),
+ box(title = "Test", width = 10,
+  plotOutput("plot",width = "1000px",height = "900px")
+    
+    
+)
+) 
+)
+
+server_1 <- function(input, output) {
+  output$plot<-renderPlot({
+  ggplot(country_comparison,aes_string(x=input$x,y=input$y,fill="Country")) + geom_col()+ theme_light(base_size = 18)+ geom_smooth(method = lm) +theme(legend.position = "bottom",axis.text=element_text(angle = 60,hjust = 1))
+    })
+    #session$onSessionEnded(stopApp)
+    }
+
+shinyApp(ui_1,server_1)
+
+```
+
+#Questions that I am thinking about when analyzing these datasets. 
+1.can you make a decent claim based on the variables from the data set? no not really, especially if we look at the high and low obesity comparison, originally we had this assumption that higher obesity rate countries may have a higher death toll. this was because the CDC had put something out that the people who were most vulnerable to COVID were people with preexisting conditions and obesity was one of them. However looking at the analysis it does not look like there is a strong correlation for this 
+
+2. SO if looking at obesity does not provide a very clear correlation, what other factor can tell us why the data looks the way it does
+-probably public response to the pandemic and the efficientcy of each respective countries health system, both of which are not represented in the data
+
+3. then what can the data sort of tell us then? 
+-The data can tell us that diet CAN play a role in the rate of recovery and death from covid 19, but it cannot be the sole reason because there are more factors outside of diet that can influence this
+
+
+
+#fix the recovery to death ratio and remove country
+```{r,eval=FALSE,echo=TRUE} 
+library(shiny)
+
+ui_1 <- dashboardPage(
+  dashboardHeader(title = "Test"),
+  dashboardSidebar(),
+  dashboardBody(
+    selectInput("x","Select X variable",choices=c("Country","Population","Recovered","Obesity","Deaths","Recovery_to_death_ratio"),
+              selected = "Deaths"),
+ selectInput("y","Select y variable",choices = c("Country","Population","Recovered","Obesity","Deaths", "Recovery_to_death_ratio"),
+              selected = "Deaths"),
+ box(title = "Test", width = 10,
+  plotOutput("plot",width = "1000px",height = "900px")
+    
+    
+)
+) 
+)
+
+server_1 <- function(input, output) {
+  output$plot<-renderPlot({
+  ggplot(kg_gen_not,aes_string(x=input$x,y=input$y)) + geom_point()+ theme_light(base_size = 18)+ geom_smooth(method = lm) +theme(legend.position = "bottom",axis.text=element_text(angle = 60,hjust = 1))
+    })
+   #session$onSessionEnded(stopApp) 
+    }
+
+
+shinyApp(ui_1,server_1)
+
+```
+
+
+```{r,eval=FALSE,echo=TRUE} 
