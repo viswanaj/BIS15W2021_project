@@ -48,7 +48,8 @@ food_data %>%
 ```{r}
 food_data %>% 
   group_by(Country) %>%
-  ggplot(aes(Vegetal.Products,Deaths))+geom_point()+geom_smooth(method = lm)
+  ggplot(aes(Vegetal.Products,Deaths))+geom_point()+geom_smooth(method = lm) +
+      labs(title = "Vegtable Products vs COVID-19 Deaths",x="Supply of Vegtable Products", y="Deaths")
 ```
 ```{r}
 food_data %>% 
@@ -64,26 +65,55 @@ food_data %>%
 ```{r}
 food_data %>% 
   group_by(Country) %>%
-  ggplot(aes(Obesity,Deaths))+geom_point()+geom_smooth()
+  ggplot(aes(Obesity,Deaths))+
+  geom_point()+
+  geom_smooth(method = lm, formula = y ~ x)+
+  labs(title = "Obesity vs COVID-19 Deaths",
+       x="Obesity",
+       y="Deaths")+
+  stat_regline_equation()
 ```
+```{r}
+#install.packages("ggpubr")
+library(ggpubr)
+```
+
+
+
+
 ```{r}
 food_data %>% 
   select(Obesity,Country) %>% 
-  arrange(desc(Obesity)) %>% 
-  mutate(island=)
+  arrange(desc(Obesity))
 ```
 ```{r}
 island_food_data<- food_data %>% 
-  filter(Country== "Samoa"| Country=="United Kingdom"| Country=="Fiji" | Country=="Japan"| Country=="Australia"| Country=="New Zealand"| Country=="Kiribati"| Country=="Iceland"| Country=="Philippines") %>% 
-   mutate(island= TRUE)
+  filter(Country== "Samoa"|
+           Country=="United Kingdom"|
+           Country=="Fiji" |
+           Country=="Japan"|
+           Country=="Australia"|
+           Country=="New Zealand"|
+           Country=="Kiribati"|
+           Country=="Iceland"|
+           Country=="Philippines") %>% 
+   mutate(Island= TRUE)
 island_food_data
 ```
 
 
 ```{r}
 non_island_food_data<- food_data %>% 
-   filter( Country!="Australia", Country!="Samoa", Country!="United Kingdom", Country!="New Zealand", Country!="Kiribati", Country!="Iceland", Country!="Philippines", Country!="Fiji", Country!="Japan" ) %>%
-  mutate(island= FALSE)
+   filter( Country!="Australia",
+           Country!="Samoa",
+           Country!="United Kingdom",
+           Country!="New Zealand",
+           Country!="Kiribati",
+           Country!="Iceland",
+           Country!="Philippines",
+           Country!="Fiji",
+           Country!="Japan" ) %>%
+  mutate(Island= FALSE)
 non_island_food_data
 ```
 ```{r}
@@ -93,24 +123,65 @@ food_data %>%
 ```
 
 ```{r}
-island_food_complete <- rbind(non_island_food_data, island_food_data)
-island_food_complete
+island_food_complete <- rbind(non_island_food_data,
+                              island_food_data)
 ```
 ```{r}
 island_food_complete %>% 
   select(Country, Undernourished) %>% 
   arrange(desc(Undernourished))
 ```
+
+```{r}
+island_food_complete %>% 
+  ggplot(aes(Obesity,Deaths,color=Island))+
+  geom_point()+
+  geom_smooth(method = lm)+
+  labs(title = "Obesity vs COVID-19 Deaths",
+       x="Obesity",
+       y="Deaths")
+```
 ```{r}
 island_food_complete %>% 
   filter(Country!= "United Kingdom") %>% 
-  ggplot(aes(Obesity,Deaths,color=island))+geom_point()+geom_smooth(method = lm)
+  ggplot(aes(Obesity,Deaths,color=Island))+
+  geom_point()+
+  geom_smooth(method = lm)+ 
+  labs(title = "Obesity vs COVID-19 Deaths"
+      ,x="Obesity",
+      y="Deaths")+
+  stat_regline_equation()
+```
+
+
+```{r}
+island_food_complete %>% 
+  mutate(recovery_death_ratio=Recovered/Deaths) %>% 
+  group_by(Island) %>% 
+  filter(recovery_death_ratio!= Inf) %>% 
+  summarise(mean_reco_death_ratio=mean(recovery_death_ratio,na.rm=T)) %>% 
+  ggplot(aes(Island,mean_reco_death_ratio, fill= Island))+
+  geom_col(color = "black")+
+  labs(title = "Recovered/Deaths Ratio Between Land Types",
+       x=NULL,
+       y=" Mean of Recovered/Deaths")+
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
 ```
 ```{r}
 island_food_complete %>% 
-  ggplot(aes(Obesity,Deaths,color=island))+geom_point()+geom_smooth(method = lm)
+  mutate(recovery_death_ratio=Recovered/Deaths) %>% 
+  filter(recovery_death_ratio!= Inf,
+         recovery_death_ratio < 300) %>% 
+  ggplot(aes(Island, recovery_death_ratio,
+             fill=Island))+
+  geom_boxplot(outlier.alpha = 0.6,color = "black")+
+  labs(title = "Recovered/Deaths Between Land Types",
+       x=NULL,
+       y=" Recovered/Deaths")+
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
 ```
-
 
 ```{r}
 well_nourished_countries<-food_data %>% 
@@ -141,15 +212,62 @@ is.numeric(nourishment_complete$Undernourished_numeric)
 
 ```{r}
 nourishment_complete <- nourishment_complete %>% 
-             mutate(nourishment_catagory= case_when(Undernourished_numeric <=2.5 ~ "low",
-                                              Undernourished_numeric > 2.5 & Undernourished_numeric <= 15 ~ "medium",
-                                              Undernourished_numeric > 15 ~ "high"))
+             mutate(nourishment_catagory= case_when(Undernourished_numeric <=2.5 ~ "low undernourishment",
+                                              Undernourished_numeric > 2.5 & Undernourished_numeric <= 15 ~ "medium undernourishment",
+                                              Undernourished_numeric > 15 ~ "high undernourishment"))
 nourishment_complete
 ```
 ```{r}
 nourishment_complete %>% 
-  ggplot(aes(Obesity, Deaths, color= nourishment_catagory))+geom_point()+geom_smooth(method = lm)
+  ggplot(aes(Undernourished_numeric, Obesity))+
+  geom_point()+geom_smooth(method = lm)+
+  labs(title = "Obesity vs Undernourishment",
+       x="Undernourishment",
+       y="Obesity")
 ```
+```{r}
+nourishment_complete
+```
+
+```{r}
+nourishment_complete %>%
+  mutate(confirmed_death_ratio=Deaths/Confirmed) %>%
+  ggplot(aes(reorder(Country,confirmed_death_ratio),
+             confirmed_death_ratio,
+             fill=nourishment_catagory))+
+  geom_col()+
+  labs(title = "COVID Deaths / Confirmed Cases: by Nourishment Catagory",
+       x=NULL,
+       y=" Death/Confirmed")+
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+```
+```{r}
+nourishment_complete %>% 
+  mutate(confirmed_death_ratio=Deaths/Confirmed) %>%
+  filter(confirmed_death_ratio>0.1)
+```
+
+```{r}
+nourishment_complete %>%
+  mutate(confirmed_death_ratio=Deaths/Confirmed) %>%
+  group_by(nourishment_catagory) %>% 
+  summarise(mean_confirmed_death_ratio= mean(confirmed_death_ratio,
+                                             na.rm=T)) %>% 
+  ggplot(aes(reorder(nourishment_catagory,mean_confirmed_death_ratio),
+             mean_confirmed_death_ratio, fill=nourishment_catagory))+
+  geom_col(color = "black")+
+  labs(title = "Average of COVID Deaths / Confirmed Cases: by Nourishment Category",
+       x=NULL, 
+       y=" Mean of Deaths/Confirmed")+
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+```
+
+
+
 
 
 
