@@ -125,6 +125,7 @@ food_experiment<- food_data %>%
   filter(Undernourished != "<2.5")
 
 ```
+
 ```{r}
   food_experiment<-food_experiment %>% 
   mutate(Undernourished_numeric=as.numeric(as.character(food_experiment$Undernourished)))
@@ -428,9 +429,9 @@ ui_1 <- dashboardPage(
   dashboardHeader(title = "Diet Observations"),
   dashboardSidebar(),
   dashboardBody(
-    selectInput("x","Select X variable",choices=c("Country","Alcoholic.Beverages","Animal.fats","Animal.Products","Aquatic.Products..Other","Cereals...Excluding.Beer","Eggs","Fish..Seafood","Fruits...Excluding.Wine","Meat","Milk...Excluding.Butter","Miscellaneous","Offals","Oilcrops","Pulses","Spices","Starchy.Roots","Stimulants","Sugar...Sweeteners","Sugar.Crops","Treenuts","Vegetable.Oils","Vegetables","Vegetal.Products","Obesity","Undernourished","Confirmed","Deaths","Recovered","Active","Population","Unit..all.except.Population."),
+    selectInput("x","Select X variable",choices=c("Country","Alcoholic.Beverages","Animal.fats","Animal.Products","Aquatic.Products..Other","Cereals...Excluding.Beer","Eggs","Fish..Seafood","Fruits...Excluding.Wine","Meat","Milk...Excluding.Butter","Miscellaneous","Offals","Oilcrops","Pulses","Spices","Starchy.Roots","Stimulants","Sugar...Sweeteners","Sugar.Crops","Treenuts","Vegetable.Oils","Vegetables","Vegetal.Products","Obesity","Undernourished","Confirmed","Deaths","Recovered","Active","Population","Unit..all.except.Population.","Recovery_to_Death_Ratio"),
               selected = "Alcoholic.Beverages"),
- selectInput("y","Select y variable",choices = c("Country","Alcoholic.Beverages","Animal.fats","Animal.Products","Aquatic.Products..Other","Cereals...Excluding.Beer","Eggs","Fish..Seafood","Fruits...Excluding.Wine","Meat","Milk...Excluding.Butter","Miscellaneous","Offals","Oilcrops","Pulses","Spices","Starchy.Roots","Stimulants","Sugar...Sweeteners","Sugar.Crops","Treenuts","Vegetable.Oils","Vegetables","Vegetal.Products","Obesity","Undernourished","Confirmed","Deaths","Recovered","Active","Population","Unit..all.except.Population."),
+ selectInput("y","Select y variable",choices = c("Country","Alcoholic.Beverages","Animal.fats","Animal.Products","Aquatic.Products..Other","Cereals...Excluding.Beer","Eggs","Fish..Seafood","Fruits...Excluding.Wine","Meat","Milk...Excluding.Butter","Miscellaneous","Offals","Oilcrops","Pulses","Spices","Starchy.Roots","Stimulants","Sugar...Sweeteners","Sugar.Crops","Treenuts","Vegetable.Oils","Vegetables","Vegetal.Products","Obesity","Undernourished","Confirmed","Deaths","Recovered","Active","Population","Unit..all.except.Population.","Recovery_to_Death_Ratio"),
               selected = "Deaths"),
  box(title = "Diet Compared to COVID-19 Deaths", width = 15,
   plotOutput("plot",width = "1000px",height = "900px")
