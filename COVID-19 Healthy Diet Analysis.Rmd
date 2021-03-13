@@ -1,5 +1,6 @@
 ---
-title: "data exploration"
+title: "COVID-19 Healthy Diet"
+authors: "Zabrisky, Derrick, and Jayashri"
 output: 
   html_document: 
     keep_md: yes
@@ -35,6 +36,7 @@ library(here)
 library(janitor)
 ```
 
+# Preliminary Analysis
 
 ```{r}
 food_data<-read.csv("food and covid data/Food_Supply_Quantity_kg_Data_general_notation.csv")
@@ -61,7 +63,11 @@ food_data %>%
   select(Alcoholic.Beverages, Country) %>% 
   arrange(desc(Alcoholic.Beverages))
 ```
-
+# A Closer Look at Obesity
+```{r}
+#install.packages("ggpubr")
+library(ggpubr)
+```
 ```{r}
 food_data %>% 
   group_by(Country) %>%
@@ -73,10 +79,7 @@ food_data %>%
        y="Deaths")+
   stat_regline_equation()
 ```
-```{r}
-#install.packages("ggpubr")
-library(ggpubr)
-```
+
 
 
 
@@ -131,7 +134,7 @@ island_food_complete %>%
   select(Country, Undernourished) %>% 
   arrange(desc(Undernourished))
 ```
-
+## Obesity vs COVID-19 Deaths by Land Type
 ```{r}
 island_food_complete %>% 
   ggplot(aes(Obesity,Deaths,color=Island))+
@@ -153,7 +156,7 @@ island_food_complete %>%
   stat_regline_equation()
 ```
 
-
+## What's Going on With the Islands
 ```{r}
 island_food_complete %>% 
   mutate(recovery_death_ratio=Recovered/Deaths) %>% 
@@ -182,7 +185,8 @@ island_food_complete %>%
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank())
 ```
-
+# A Closer Look at Nourishment
+## Cleaning the Data
 ```{r}
 well_nourished_countries<-food_data %>% 
   filter(Undernourished== "<2.5") %>% 
@@ -280,7 +284,7 @@ nourishment_complete %>%
 
 
 
-
+# App Creation
 ```{r}
 kg_gen_not<-read.csv("food and covid data/Food_Supply_Quantity_kg_Data_general_notation.csv")
 ```
@@ -609,18 +613,7 @@ shinyApp(ui_1,server_1)
 
 ```
 
-#Questions that I am thinking about when analyzing these datasets. 
-1.can you make a decent claim based on the variables from the data set? no not really, especially if we look at the high and low obesity comparison, originally we had this assumption that higher obesity rate countries may have a higher death toll. this was because the CDC had put something out that the people who were most vulnerable to COVID were people with preexisting conditions and obesity was one of them. However looking at the analysis it does not look like there is a strong correlation for this 
 
-2. SO if looking at obesity does not provide a very clear correlation, what other factor can tell us why the data looks the way it does
--probably public response to the pandemic and the efficientcy of each respective countries health system, both of which are not represented in the data
-
-3. then what can the data sort of tell us then? 
--The data can tell us that diet CAN play a role in the rate of recovery and death from covid 19, but it cannot be the sole reason because there are more factors outside of diet that can influence this
-
-
-
-#fix the recovery to death ratio and remove country
 ```{r,eval=FALSE,echo=TRUE} 
 library(shiny)
 
